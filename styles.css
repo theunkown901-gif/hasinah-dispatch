@@ -559,6 +559,12 @@ main {
   text-align: center;
 }
 
+.compact-empty {
+  min-height: 110px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
 body[data-role="driver"] .admin-only,
 body[data-role="driver"] #ordersView,
 body[data-role="driver"] #accountsView,
