@@ -63,6 +63,12 @@ const els = {
   resetDemoBtn: document.querySelector("#resetDemoBtn")
 };
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => registration.unregister());
+  });
+}
+
 document.querySelectorAll(".nav-tab").forEach((tab) => {
   tab.addEventListener("click", () => setView(tab.dataset.view));
 });
@@ -139,7 +145,10 @@ els.accountForm.addEventListener("submit", async (event) => {
   await api("/api/accounts", { method: "POST", body: payload });
   els.accountForm.reset();
   await loadState();
-  activeDriverId = drivers()[0]?.id || "";
+  if (payload.role === "driver") {
+    const createdDriver = drivers().find((driver) => driver.username === payload.username.toLowerCase());
+    activeDriverId = createdDriver?.id || drivers()[0]?.id || "";
+  }
   render();
 });
 
@@ -151,7 +160,13 @@ async function api(path, options = {}) {
     body: options.body ? JSON.stringify(options.body) : undefined,
     cache: "no-store"
   });
-  const result = await response.json();
+  const raw = await response.text();
+  let result = {};
+  try {
+    result = raw ? JSON.parse(raw) : {};
+  } catch {
+    throw new Error(raw || "تعذر الاتصال بالخادم. حدث الصفحة وحاول مرة ثانية.");
+  }
   if (!response.ok || result.ok === false) throw new Error(result.message || "Request failed.");
   return result.data || result;
 }
@@ -498,6 +513,7 @@ function renderDriverOptions() {
   els.driverSelect.innerHTML = unassigned + options;
   els.activeDriverSelect.innerHTML = options || '<option value="">لا يوجد سائقون</option>';
   els.activeDriverSelect.value = activeDriverId;
+  els.driverSelect.disabled = !drivers().length;
 }
 
 function renderFilters() {
@@ -604,6 +620,10 @@ function renderDriverQueue() {
 }
 
 function renderAccountList() {
+  const driverCount = drivers().length;
+  const hint = driverCount
+    ? ""
+    : `<div class="empty-state compact-empty"><div><strong>لا يوجد سائقون بعد</strong><br /><span>أنشئ حساب سائق من النموذج، بعدها سيظهر في إضافة الطلب والفلاتر ولوحة السائق.</span></div></div>`;
   els.accountList.innerHTML = state.users.length
     ? state.users
         .map((user) => {
@@ -619,7 +639,7 @@ function renderAccountList() {
             </article>
           `;
         })
-        .join("")
+        .join("") + hint
     : getEmptyState("لا توجد حسابات", "أنشئ أول حساب.");
 }
 
@@ -770,10 +790,6 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
   return escapeHtml(value).replace(/`/g, "&#096;");
-}
-
-if ("serviceWorker" in navigator && !IS_FILE_MODE) {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
 bootApp();
