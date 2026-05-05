@@ -1,0 +1,279 @@
+:root {
+  color-scheme: dark;
+  --ink: #fff7ef;
+  --muted: #d7bfc8;
+  --line: rgba(244, 210, 166, 0.22);
+  --panel: rgba(22, 10, 16, 0.9);
+  --accent: #f0bd7c;
+  --ok: #8ee0ac;
+  --danger: #ff9ba7;
+  --warn: #ffd28b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top right, rgba(240, 189, 124, 0.18), transparent 30rem),
+    linear-gradient(135deg, #080609, #2b0f1c 58%, #080609);
+  font-family: Tahoma, Arial, ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.admin-page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.login-view {
+  display: grid;
+  gap: 18px;
+  width: min(460px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  align-content: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(240, 189, 124, 0.58);
+  border-radius: 8px;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.login-view h1,
+.admin-topbar h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #f6dbe4;
+  font-weight: 800;
+}
+
+input,
+textarea {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+  outline: 0;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(240, 189, 124, 0.12);
+}
+
+.login-view button,
+.topbar-actions button,
+.topbar-actions a,
+.filter,
+.order-actions button,
+.modal-actions button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.login-view button,
+.filter.active,
+.order-actions .approve,
+.modal-actions #confirmDenyBtn {
+  color: #1b0d12;
+  background: linear-gradient(135deg, #ffe1af, var(--accent));
+}
+
+#loginError {
+  color: var(--danger);
+  min-height: 24px;
+}
+
+.orders-view {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-topbar p,
+.order-card dt,
+.empty {
+  color: var(--muted);
+}
+
+.topbar-actions,
+.filters,
+.order-actions,
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.orders-list {
+  display: grid;
+  gap: 14px;
+}
+
+.order-card,
+.modal-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--panel);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.order-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.order-head div {
+  display: grid;
+  gap: 5px;
+}
+
+.order-head mark {
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #1b0d12;
+  background: var(--warn);
+  font-weight: 900;
+}
+
+.order-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.order-card dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.evidence-links {
+  display: grid;
+  gap: 8px;
+}
+
+.evidence-links a,
+.evidence-links span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid rgba(244, 210, 166, 0.18);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+}
+
+.evidence-links img {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.order-actions .deny {
+  color: #2a0c13;
+  background: var(--danger);
+}
+
+.order-actions .skip {
+  color: #241505;
+  background: var(--warn);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.56);
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal-card {
+  width: min(520px, 100%);
+}
+
+@media (max-width: 760px) {
+  .admin-topbar,
+  .order-head {
+    flex-direction: column;
+  }
+
+  .order-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-actions a,
+  .topbar-actions button,
+  .filter,
+  .order-actions button {
+    width: 100%;
+  }
+}
