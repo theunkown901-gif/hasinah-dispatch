@@ -1,15 +1,8 @@
 const CACHE_NAME = "hasinah-shell-v4";
-const SHELL_FILES = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/app.js",
-  "/manifest.webmanifest",
-  "/assets/hasinah-icon.svg"
-];
+const SHELL_FILES = [];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_FILES)));
+  event.waitUntil(caches.delete(CACHE_NAME));
   self.skipWaiting();
 });
 
@@ -23,7 +16,5 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-  if (url.pathname.startsWith("/api/")) return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+  event.respondWith(fetch(event.request));
 });
