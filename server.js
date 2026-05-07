@@ -6,9 +6,11 @@ const PORT = Number(process.env.PORT || 4173);
 const HOST = process.env.HOST || "0.0.0.0";
 const ROOT = __dirname;
 const DATA_FILE = path.join(ROOT, "data", "dispatch-state.json");
+const RETURN_REQUESTS_FILE = path.join(ROOT, "data", "return-requests.jsonl");
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const ALLOW_DANGEROUS_RESET = process.env.ALLOW_DANGEROUS_RESET === "true";
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -96,14 +98,26 @@ async function readSupabaseState() {
 }
 
 async function writeSupabaseState(state) {
-  await supabaseRequest("hasinah_orders?id=not.is.null", { method: "DELETE", prefer: "return=minimal" });
-  await supabaseRequest("hasinah_users?id=not.is.null", { method: "DELETE", prefer: "return=minimal" });
   if (state.users.length) {
-    await supabaseRequest("hasinah_users", { method: "POST", body: state.users.map(toDbUser), prefer: "return=minimal" });
+    await supabaseRequest("hasinah_users", {
+      method: "POST",
+      body: state.users.map(toDbUser),
+      prefer: "resolution=merge-duplicates,return=minimal"
+    });
   }
   if (state.orders.length) {
-    await supabaseRequest("hasinah_orders", { method: "POST", body: state.orders.map(toDbOrder), prefer: "return=minimal" });
+    await supabaseRequest("hasinah_orders", {
+      method: "POST",
+      body: state.orders.map(toDbOrder),
+      prefer: "resolution=merge-duplicates,return=minimal"
+    });
   }
+}
+
+async function resetSupabaseState(state) {
+  await supabaseRequest("hasinah_orders?id=not.is.null", { method: "DELETE", prefer: "return=minimal" });
+  await supabaseRequest("hasinah_users?id=not.is.null", { method: "DELETE", prefer: "return=minimal" });
+  await writeSupabaseState(state);
 }
 
 function fromDbUser(row) {
@@ -188,8 +202,8 @@ function toDbOrder(order) {
   };
 }
 
-function send(res, status, body, type = "application/json; charset=utf-8") {
-  res.writeHead(status, { "content-type": type, "cache-control": "no-store" });
+function send(res, status, body, type = "application/json; charset=utf-8", extraHeaders = {}) {
+  res.writeHead(status, { "content-type": type, "cache-control": "no-store", ...extraHeaders });
   if (Buffer.isBuffer(body) || typeof body === "string") {
     res.end(body);
     return;
@@ -388,6 +402,51 @@ function markLateOrders(state) {
   });
 }
 
+async function checkReturnEligibility(payload) {
+  const customerName = String(payload.customerName || "").trim();
+  const orderNumber = String(payload.orderNumber || "").trim();
+  if (!customerName || !orderNumber) {
+    return { ok: false, eligible: false, message: "اكتب الاسم ورقم الطلب أولا." };
+  }
+  return {
+    ok: true,
+    eligible: true,
+    message: "الطلب مؤهل، يمكن إكمال طلب الإرجاع أو الاستبدال.",
+    order: {
+      id: `return-${orderNumber}`,
+      number: orderNumber,
+      status: "تم التحقق",
+      updatedAt: new Date().toISOString(),
+      hoursLeft: 24,
+      customerName,
+      products: [
+        { id: "item-1", name: "منتج من الطلب", sku: orderNumber, quantity: 1 }
+      ]
+    }
+  };
+}
+
+async function saveReturnRequest(payload, eligibility) {
+  const request = {
+    id: `RET-${Date.now().toString(36).toUpperCase()}`,
+    createdAt: new Date().toISOString(),
+    order: eligibility.order,
+    customerName: String(payload.customerName || "").trim(),
+    orderNumber: String(payload.orderNumber || "").trim(),
+    phone: String(payload.phone || "").trim(),
+    requestType: String(payload.requestType || "").trim(),
+    reason: String(payload.reason || "").trim(),
+    notes: String(payload.notes || "").trim(),
+    selectedProducts: Array.isArray(payload.selectedProducts) ? payload.selectedProducts : [],
+    evidenceFiles: Array.isArray(payload.evidenceFiles) ? payload.evidenceFiles : [],
+    shippingCity: String(payload.shippingCity || "").trim(),
+    shippingCompany: String(payload.shippingCompany || "").trim()
+  };
+  await fs.mkdir(path.dirname(RETURN_REQUESTS_FILE), { recursive: true });
+  await fs.appendFile(RETURN_REQUESTS_FILE, `${JSON.stringify(request)}\n`, "utf8");
+  return { ok: true, requestId: request.id, message: "تم استلام الطلب بنجاح." };
+}
+
 async function handleApi(req, res, url) {
   const state = await readState();
 
@@ -414,9 +473,33 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  if (url.pathname === "/api/returns/check" && req.method === "POST") {
+    send(res, 200, await checkReturnEligibility(await readBody(req)));
+    return true;
+  }
+
+  if (url.pathname === "/api/returns/submit" && req.method === "POST") {
+    const payload = await readBody(req);
+    const eligibility = await checkReturnEligibility(payload);
+    if (!eligibility.eligible) {
+      send(res, 422, eligibility);
+      return true;
+    }
+    send(res, 200, await saveReturnRequest(payload, eligibility));
+    return true;
+  }
+
   if (url.pathname === "/api/reset" && req.method === "POST") {
+    if (!ALLOW_DANGEROUS_RESET) {
+      send(res, 403, { ok: false, message: "Reset is disabled to protect production data." });
+      return true;
+    }
     const initial = seedState();
-    await writeState(initial);
+    if (useSupabase()) {
+      await resetSupabaseState(initial);
+    } else {
+      await writeState(initial);
+    }
     send(res, 200, publicState(initial));
     return true;
   }
@@ -448,13 +531,29 @@ async function handleApi(req, res, url) {
 
 async function serveStatic(req, res) {
   const requestPath = new URL(req.url, `http://${req.headers.host}`).pathname;
-  const safePath = requestPath === "/" ? "/index.html" : decodeURIComponent(requestPath);
-  const filePath = path.normalize(path.join(ROOT, safePath));
+  if (requestPath === "/return" || requestPath === "/return.html" || requestPath === "/returns") {
+    send(res, 302, "", "text/plain; charset=utf-8", { location: "/returns/" });
+    return;
+  }
+  if (requestPath === "/delivery") {
+    send(res, 302, "", "text/plain; charset=utf-8", { location: "/delivery/" });
+    return;
+  }
+  if (requestPath === "/garments") {
+    send(res, 302, "", "text/plain; charset=utf-8", { location: "/garments/" });
+    return;
+  }
+  let safePath = requestPath === "/" ? "/index.html" : decodeURIComponent(requestPath);
+  let filePath = path.normalize(path.join(ROOT, safePath));
   if (!filePath.startsWith(ROOT)) {
     send(res, 403, "Forbidden", "text/plain; charset=utf-8");
     return;
   }
   try {
+    const stat = await fs.stat(filePath).catch(() => null);
+    if (stat?.isDirectory()) {
+      filePath = path.join(filePath, "index.html");
+    }
     const body = await fs.readFile(filePath);
     send(res, 200, body, MIME[path.extname(filePath)] || "application/octet-stream");
   } catch {
