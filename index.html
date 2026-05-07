@@ -3,259 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#18332f" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="حسينة" />
-    <title>حسينة</title>
+    <meta name="theme-color" content="#070a12" />
+    <title>حسينة | البوابة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="assets/hasinah-icon.svg" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <section id="loginScreen" class="login-screen">
-      <form id="loginForm" class="login-panel simple-login">
-        <div class="brand-mark" aria-hidden="true">H</div>
-        <h1>حسينة</h1>
-        <input id="loginUsername" autocomplete="username" placeholder="اسم المستخدم" required />
-        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="كلمة المرور" required />
-        <button class="primary-button" type="submit">دخول</button>
-        <p id="loginError" class="form-error" role="alert"></p>
-      </form>
-    </section>
-
-    <div id="appShell" class="app-shell hidden">
-      <aside class="sidebar">
-        <div class="brand-row">
+    <main class="portal-page">
+      <section id="portalLogin" class="portal-login">
+        <form id="portalLoginForm" class="portal-login-card">
           <div class="brand-mark" aria-hidden="true">H</div>
-          <div>
-            <h1>حسينة</h1>
-            <p id="sessionLabel">التشغيل</p>
+          <h1>حسينة</h1>
+          <p>بوابة الأنظمة الداخلية لحسينة</p>
+          <input id="portalUsername" autocomplete="username" placeholder="اسم المستخدم" required />
+          <input id="portalPassword" type="password" autocomplete="current-password" placeholder="كلمة المرور" required />
+          <button class="primary-button" type="submit">دخول</button>
+          <p id="portalError" class="form-error" role="alert"></p>
+        </form>
+      </section>
+
+      <section id="portalHub" class="portal-hub hidden">
+        <header class="portal-header">
+          <div class="brand-row">
+            <div class="brand-mark" aria-hidden="true">H</div>
+            <div>
+              <p class="eyebrow">حسينة</p>
+              <h1>اختاري النظام</h1>
+              <span>كل تطبيقات التشغيل في مكان واحد.</span>
+            </div>
           </div>
-        </div>
-
-        <nav class="nav-tabs" aria-label="التنقل الرئيسي">
-          <button class="nav-tab admin-only active" data-view="submit" type="button">إضافة طلب</button>
-          <button class="nav-tab admin-only" data-view="orders" type="button">لوحة الطلبات</button>
-          <button class="nav-tab active" data-view="driver" type="button">السائق</button>
-          <button class="nav-tab admin-only" data-view="accounts" type="button">الحسابات</button>
-          <button class="nav-tab admin-only" data-view="requests" type="button">المراجعة</button>
-        </nav>
-
-        <section class="admin-only driver-picker">
-          <label>
-            عرض لوحة سائق
-            <select id="activeDriverSelect"></select>
-          </label>
-        </section>
-
-        <div class="metric-stack">
-          <div><strong id="openCount">0</strong><span>مفتوحة</span></div>
-          <div><strong id="todayDoneCount">0</strong><span>منجزة</span></div>
-          <div><strong id="failedCount">0</strong><span>متأخرة</span></div>
-        </div>
-
-        <button id="logoutBtn" class="ghost-button" type="button">تسجيل الخروج</button>
-      </aside>
-
-      <main>
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">حسينة جدة</p>
-            <h2 id="viewTitle">إضافة طلب</h2>
-          </div>
-          <div class="search-wrap">
-            <span aria-hidden="true">بحث</span>
-            <input id="searchInput" type="search" placeholder="رقم الطلب، الاسم، الجوال، الحي" />
-          </div>
+          <button id="portalLogout" class="ghost-button" type="button">تسجيل الخروج</button>
         </header>
 
-        <section id="submitView" class="view active-view">
-          <form id="orderForm" class="panel order-form submit-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">إضافة طلب</p>
-                <h3>طلب عميل أو مشوار خاص</h3>
-              </div>
-              <button id="resetDemoBtn" class="icon-button" type="button">مسح</button>
-            </div>
+        <nav class="portal-grid two-apps" aria-label="أنظمة حسينة">
+          <a class="portal-card delivery-card" href="https://hasinah-dispatch.onrender.com/" target="_blank" rel="noreferrer">
+            <span class="portal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img">
+                <path d="M3.5 7.5h10.2v8.8H3.5z" />
+                <path d="M13.7 10.2h3.1l2.2 2.6v3.5h-5.3z" />
+                <path d="M7.2 18.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM16.7 18.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z" />
+                <path d="M5.5 5.4h6.8" />
+              </svg>
+            </span>
+            <span class="portal-copy">
+              <strong>تطبيق التوصيل والسائقين</strong>
+              <small>لإضافة طلبات التوصيل، تعيين السائقين، متابعة حالات الطلب، احتساب مستحقات السائقين، ومراجعة التأخير أو الاعتراضات.</small>
+            </span>
+            <span class="portal-open" aria-hidden="true">فتح</span>
+          </a>
 
-            <label>
-              نوع الطلب
-              <select id="jobKind" name="kind">
-                <option value="customer">طلب عميل</option>
-                <option value="custom">مشوار خاص</option>
-              </select>
-            </label>
-
-            <div class="two-col">
-              <label>
-                رقم الطلب
-                <input name="number" placeholder="123456" required />
-              </label>
-              <label>
-                الاسم
-                <input name="customer" placeholder="اسم العميل أو المشوار" required />
-              </label>
-            </div>
-
-            <div class="two-col">
-              <label>
-                رقم الواتساب
-                <input name="phone" inputmode="tel" placeholder="0512345122" required />
-              </label>
-              <label>
-                الحي
-                <input name="area" placeholder="الروضة" required />
-              </label>
-            </div>
-
-            <div class="two-col">
-              <label>
-                السائق
-                <select id="driverSelect" name="driverId"></select>
-              </label>
-              <label>
-                نوع العملية
-                <select name="type">
-                  <option value="Delivery">توصيل</option>
-                  <option value="Replacement">استبدال</option>
-                  <option value="Return">إرجاع</option>
-                </select>
-              </label>
-            </div>
-
-            <div id="customFields" class="custom-fields hidden">
-              <div class="two-col">
-                <label>
-                  مبلغ المشوار الخاص (ريال)
-                  <input name="customAmount" inputmode="decimal" placeholder="45" />
-                </label>
-                <label>
-                  تاريخ طلب التوصيل
-                  <input name="requestDate" type="datetime-local" />
-                </label>
-              </div>
-              <label>
-                المؤقت بعد قبول السائق (بالساعات)
-                <input name="timerHours" inputmode="numeric" placeholder="24" />
-              </label>
-            </div>
-
-            <button class="primary-button" type="submit">إضافة الطلب</button>
-          </form>
-        </section>
-
-        <section id="ordersView" class="view">
-          <section class="panel board-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">لوحة الطلبات</p>
-                <h3>متابعة وتصنيف الطلبات</h3>
-              </div>
-            </div>
-
-            <div id="orderStats" class="order-stats" aria-label="إحصائيات الطلبات"></div>
-
-            <div class="filter-grid">
-              <select id="categoryFilter" aria-label="فلتر نوع الطلب">
-                <option value="all">كل الأنواع</option>
-                <option value="order">طلبات عادية</option>
-                <option value="return">إرجاعات</option>
-                <option value="replacement">استبدالات</option>
-                <option value="custom">مشاوير خاصة</option>
-              </select>
-              <select id="statusFilter" aria-label="فلتر الحالة">
-                <option value="all">كل الطلبات</option>
-                <option value="new">جديد</option>
-                <option value="pending_acceptance">بانتظار السائق</option>
-                <option value="accepted">مقبول</option>
-                <option value="completed">منجز</option>
-                <option value="late">متأخر</option>
-                <option value="cancelled">ملغي</option>
-              </select>
-              <select id="driverFilter" class="admin-only" aria-label="فلتر السائق"></select>
-            </div>
-
-            <div id="ordersBoard" class="orders-list"></div>
-          </section>
-        </section>
-
-        <section id="driverView" class="view">
-          <section class="driver-hero">
-            <p class="eyebrow">لوحة السائق</p>
-            <h3 id="driverNameHeading">السائق</h3>
-            <p id="driverRouteSummary"></p>
-            <div class="driver-money">
-              <strong id="driverOwed">0 ريال</strong>
-              <span>المبلغ المستحق الحالي</span>
-            </div>
-          </section>
-          <div id="driverStats" class="order-stats driver-stats" aria-label="إحصائيات السائق"></div>
-          <div id="driverOrders" class="driver-orders"></div>
-        </section>
-
-        <section id="accountsView" class="view">
-          <div class="settings-grid">
-            <form id="accountForm" class="panel order-form">
-              <div class="panel-heading">
-                <div>
-                  <p class="eyebrow">المستخدمون</p>
-                  <h3>إنشاء مدير أو سائق</h3>
-                </div>
-              </div>
-              <label>
-                الدور
-                <select id="accountRole">
-                  <option value="driver">سائق</option>
-                  <option value="admin">مدير</option>
-                </select>
-              </label>
-              <label>
-                الاسم
-                <input id="accountName" required />
-              </label>
-              <label>
-                الجوال
-                <input id="accountPhone" inputmode="tel" placeholder="05xxxxxxxx" />
-              </label>
-              <div class="two-col">
-                <label>
-                  اسم المستخدم
-                  <input id="accountUsername" required />
-                </label>
-                <label>
-                  كلمة المرور
-                  <input id="accountPassword" required />
-                </label>
-              </div>
-              <button class="primary-button" type="submit">إنشاء الحساب</button>
-            </form>
-
-            <section class="panel board-panel">
-              <div class="panel-heading">
-                <div>
-                  <p class="eyebrow">الفريق</p>
-                  <h3>الحسابات</h3>
-                </div>
-              </div>
-              <div id="accountList" class="driver-list"></div>
-            </section>
-          </div>
-        </section>
-
-        <section id="requestsView" class="view">
-          <section class="panel board-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">موافقة الإدارة</p>
-                <h3>طلبات التأجيل والاعتراضات</h3>
-              </div>
-            </div>
-            <div id="requestList" class="orders-list"></div>
-          </section>
-        </section>
-      </main>
-    </div>
+          <a class="portal-card garments-card" href="https://theunkown901-gif.github.io/garmentyahya/" target="_blank" rel="noreferrer">
+            <span class="portal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img">
+                <path d="M9 4.2 12 6l3-1.8 3.4 2.2-2 4.2-1.8-.8v9.9H9.4V9.8l-1.8.8-2-4.2z" />
+                <path d="M9.4 9.8c1.8 1.1 3.4 1.1 5.2 0" />
+                <path d="M11 6.6h2" />
+              </svg>
+            </span>
+            <span class="portal-copy">
+              <strong>تطبيق تتبع الملابس</strong>
+              <small>لإدارة قطع الملابس، الأكواد، الكميات، العملاء، عمليات البيع، والمتابعة اليومية للمخزون والحركة.</small>
+            </span>
+            <span class="portal-open" aria-hidden="true">فتح</span>
+          </a>
+        </nav>
+      </section>
+    </main>
 
     <script src="app.js"></script>
   </body>
